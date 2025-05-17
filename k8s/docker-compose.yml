@@ -1,0 +1,4 @@
+services:
+  task-api:
+    image: ${REGISTRY}/task-api:latest
+    build: ..

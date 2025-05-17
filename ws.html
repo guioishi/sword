@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Manager Notifications WebSocket</h2>
+  <pre id="log"></pre>
+  <script>
+    fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username: "manager", password: "manager" })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const token = "Bearer " + data.token;
+        const socket = new WebSocket(`ws://localhost:8080/ws/notifications?token=${token}`);
+    
+        socket.onmessage = ({ data }) => {
+          const { tech_id, summary, date } = JSON.parse(data.replace("\n", ""))
+          document.getElementById("log").textContent += `The tech ${tech_id} performed the task ${summary} on date ${date}.\n`;
+        };
+    
+        socket.onerror = () => {
+          document.getElementById("log").textContent += "WebSocket error\n";
+        };
+    
+        socket.onclose = () => {
+          document.getElementById("log").textContent += "WebSocket closed\n";
+        };
+    })
+  </script>
+</body>
+</html>
